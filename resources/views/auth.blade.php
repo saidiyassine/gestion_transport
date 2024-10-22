@@ -1,0 +1,10 @@
+@extends("auth.master")
+@section("head")
+@include("auth.layouts.head")
+@endsection
+@section("main")
+@include("auth.layouts.main")
+@endsection
+@section("footer-script")
+@include("auth.layouts.footer-script")
+@endsection
