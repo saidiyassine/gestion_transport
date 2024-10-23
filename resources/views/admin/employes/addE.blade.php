@@ -29,7 +29,7 @@
             <div class="card-header">
                 <h3 class="card-title">Formulaire d'Ajout</h3>
             </div>
-            <form action="{{ url('admin/employe/add') }}" method="POST">
+            <form action="{{ url('admin/employes/add') }}" method="POST">
                 @csrf
                 <div class="card-body">
                     <div class="form-group">

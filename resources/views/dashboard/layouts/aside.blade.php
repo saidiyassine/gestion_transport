@@ -25,13 +25,13 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ url('admin/employes/lister') }}" class="nav-link @if(Request::segment('2') == "employes") active @endif">
+                    <a href="{{ url('admin/employes/lister') }}" class="nav-link @if(Request::segment('2') == "employes")  active @endif">
                         <i class="nav-icon fas fa-user"></i>
                         <p>Employé</p>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ url('admin/transports') }}" class="nav-link @if(Request::segment('2') == "transports") active @endif">
+                    <a href="{{ url('admin/transports/lister') }}" class="nav-link @if(Request::segment('2') == "transports") active @endif">
                         <i class="nav-icon fas fa-bus"></i>
                         <p>Transport</p>
                     </a>

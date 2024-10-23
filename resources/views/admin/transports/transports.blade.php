@@ -18,10 +18,10 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Liste des Employés (Total: {{ $total_employees }})</h1>
+                    <h1>Liste des Transports (Total: {{ $total_transports }})</h1>
                 </div>
                 <div class="col-sm-6" style="text-align: right;">
-                    <a href="{{url('/admin/employes/add')}}" class="btn btn-primary">Ajouter Employé(e)</a>
+                    <a href="{{url('/admin/transports/add')}}" class="btn btn-primary">Ajouter Transport</a>
                 </div>
             </div>
         </div><!-- /.container-fluid -->
@@ -40,14 +40,14 @@
             </div>
             @endif
             <div class="card-header">
-                <h3 class="card-title">Rechercher un Employé</h3>
+                <h3 class="card-title">Rechercher un Transport</h3>
             </div>
-            <form action="{{ url('admin/employes/lister') }}" method="GET" onsubmit="return validateForm()">
+            <form action="{{ url('admin/transports/lister') }}" method="GET" onsubmit="return validateForm()">
                 <div class="card-body">
                     <div class="row">
                         <div class="form-group col-md-3">
-                            <label for="nameInput">Nom Complet</label>
-                            <input type="text" name="name" class="form-control" id="nameInput" placeholder="Saisir le nom">
+                            <label for="nameInput">Nom du Transport</label>
+                            <input type="text" name="name" class="form-control" id="nameInput" placeholder="Saisir le nom du transport">
                         </div>
                         <div class="form-group col-md-3">
                             <label for="latitudeInput">Latitude</label>
@@ -59,7 +59,7 @@
                         </div>
                         <div class="form-group col-md-3 d-flex" style="margin-top: 32px;">
                             <button class="btn btn-primary me-2" type="submit">Chercher</button>
-                            <a style="margin-left: 4px" href="{{ url('admin/employes/lister') }}" class="btn btn-success">Réinitialiser</a>
+                            <a style="margin-left: 4px" href="{{ url('admin/transports/lister') }}" class="btn btn-success">Réinitialiser</a>
                         </div>
                     </div>
                 </div>
@@ -70,7 +70,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Liste des Employés</h3>
+                <h3 class="card-title">Liste des Transports</h3>
             </div>
             <div class="card-body p-0">
                 <table class="table">
@@ -79,23 +79,27 @@
                             <th>Nom</th>
                             <th>Latitude</th>
                             <th>Longitude</th>
+                            <th>Capacité</th>
+                            <th>Zone de Circulation</th>
                             <th>Opérations</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($employees as $employee)
+                        @foreach ($transports as $transport)
                         <tr>
-                            <td>{{ $employee->name }}</td>
-                            <td>{{ $employee->latitude }}</td>
-                            <td>{{ $employee->longitude }}</td>
+                            <td>{{ $transport->name }}</td>
+                            <td>{{ $transport->center_lat }}</td>
+                            <td>{{ $transport->center_lng }}</td>
+                            <td>{{ $transport->capacity }}</td>
+                            <td>{{ $transport->zone_coordinates }}</td>
                             <td>
-                                <a class="btn btn-primary" href="{{ url('admin/employe/editer/'.$employee->id) }}" title="Modifier cet employé">
+                                <a class="btn btn-primary" href="{{ url('admin/transports/editer/'.$transport->id) }}" title="Modifier ce transport">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a class="btn btn-danger" href="{{ url('admin/employe/supprimer/'.$employee->id) }}" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet Employé ?');" title="Supprimer cet employé">
+                                <a class="btn btn-danger" href="{{ url('admin/transports/supprimer/'.$transport->id) }}" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce transport ?');" title="Supprimer ce transport">
                                     <i class="fas fa-trash"></i>
                                 </a>
-                                <a class="btn btn-success" href="{{ url('admin/employe/localisation/'.$employee->id) }}" title="Afficher la localisation de cet employé">
+                                <a class="btn btn-success" href="{{ url('admin/transports/localisation/'.$transport->id) }}" title="Afficher la localisation de ce transport">
                                     <i class="fas fa-map-marker-alt"></i>
                                 </a>
                             </td>
@@ -104,7 +108,7 @@
                     </tbody>
                 </table>
                 <div style="padding: 10px; float: right;">
-                    {{ $employees->links() }}
+                    {{ $transports->links() }}
                 </div>
             </div>
         </div>
