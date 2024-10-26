@@ -22,6 +22,7 @@
                 </div>
                 <div class="col-sm-6" style="text-align: right;">
                     <a href="{{url('/admin/transports/add')}}" class="btn btn-primary">Ajouter Transport</a>
+                    <a href="{{url('/admin/transports/showAllZones')}}" class="btn btn-success">Afficher toutes les zones</a>
                 </div>
             </div>
         </div><!-- /.container-fluid -->
@@ -91,7 +92,7 @@
                             <td>{{ $transport->center_lat }}</td>
                             <td>{{ $transport->center_lng }}</td>
                             <td>{{ $transport->capacity }}</td>
-                            <td>{{ $transport->zone_coordinates }}</td>
+                            <td>{{ $transport->radius }}</td>
                             <td>
                                 <a class="btn btn-primary" href="{{ url('admin/transports/editer/'.$transport->id) }}" title="Modifier ce transport">
                                     <i class="fas fa-edit"></i>

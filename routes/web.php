@@ -21,5 +21,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get("/admin/transports/lister",[TransportController::class,"lister"]);
     Route::get("/admin/transports/add",[TransportController::class,"addForm"]);
     Route::post("/admin/transports/add",[TransportController::class,"addT"]);
+    Route::get("/admin/transports/editer/{id}",[TransportController::class,"editer"]);
+    Route::post("/admin/transports/update/{id}",[TransportController::class,"modifier"]);
+    Route::get("/admin/transports/supprimer/{id}",[TransportController::class,"supprimer"]);
     Route::get("/admin/transports/localisation/{id}",[TransportController::class,"showLocation"]);
+    Route::get("/admin/transports/showAllZones/",[TransportController::class,"showAllZones"]);
 });

@@ -51,12 +51,6 @@
                                         <input required type="number" class="form-control" id="capacity" name="capacity" placeholder="Saisir la capacité du transport" required>
                                     </div>
 
-                                    <!-- Coordonnées de la zone (Polygone) -->
-                                    <div class="form-group col-md-12">
-                                        <label for="zone_coordinates">Coordonnées de la Zone (Polygone)</label>
-                                        <textarea required class="form-control" id="zone_coordinates" name="zone_coordinates" rows="3" placeholder="Saisir les coordonnées du polygone (format: [[lat1, lng1], [lat2, lng2], ...])"></textarea>
-                                    </div>
-
                                     <!-- Centre du Cercle: Latitude -->
                                     <div class="form-group col-md-6">
                                         <label for="center_lat">Latitude du Centre</label>
