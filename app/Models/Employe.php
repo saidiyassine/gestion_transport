@@ -15,6 +15,7 @@ class Employe extends Model
 
     // Specify the fillable fields for mass assignment
     protected $fillable = [
+        'Mat',
         'name',
         'latitude',
         'longitude'

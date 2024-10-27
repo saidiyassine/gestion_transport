@@ -33,6 +33,10 @@
                 @csrf
                 <div class="card-body">
                     <div class="form-group">
+                        <label for="name">Matricule</label>
+                        <input type="text" name="mat" class="form-control" id="name" required placeholder="Saisir le matricule" required>
+                    </div>
+                    <div class="form-group">
                         <label for="name">Nom Complet</label>
                         <input type="text" name="name" class="form-control" id="name" required placeholder="Saisir le nom" required>
                     </div>

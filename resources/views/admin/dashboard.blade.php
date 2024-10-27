@@ -39,10 +39,10 @@
             <!-- small box -->
             <div class="small-box bg-success">
               <div class="inner">
-                @isset($adminCount)
-                <h3>{{ $adminCount }}</h3>
+                @isset($employes)
+                <h3>{{ $employes }}</h3>
                 @endisset
-                <p>Employés</p>
+                <p>Employés(e)</p>
               </div>
               <div class="icon">
                 <i class="ion ion-person"></i>
@@ -54,8 +54,8 @@
             <!-- small box -->
             <div class="small-box bg-info">
               <div class="inner">
-                @isset($directeurCount)
-                <h3>{{ $directeurCount }}</h3>
+                @isset($transports)
+                <h3>{{ $transports }}</h3>
                 @endisset
                 <p>Transports</p>
               </div>

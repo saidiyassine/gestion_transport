@@ -46,16 +46,12 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="form-group col-md-3">
+                            <label for="latitudeInput">Matricule</label>
+                            <input type="text" name="mat" class="form-control" id="matInput" placeholder="Saisir le matricule">
+                        </div>
+                        <div class="form-group col-md-3">
                             <label for="nameInput">Nom Complet</label>
                             <input type="text" name="name" class="form-control" id="nameInput" placeholder="Saisir le nom">
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label for="latitudeInput">Latitude</label>
-                            <input type="text" name="latitude" class="form-control" id="latitudeInput" placeholder="Saisir la latitude">
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label for="longitudeInput">Longitude</label>
-                            <input type="text" name="longitude" class="form-control" id="longitudeInput" placeholder="Saisir la longitude">
                         </div>
                         <div class="form-group col-md-3 d-flex" style="margin-top: 32px;">
                             <button class="btn btn-primary me-2" type="submit">Chercher</button>
@@ -76,6 +72,7 @@
                 <table class="table">
                     <thead>
                         <tr>
+                            <th>Matricule</th>
                             <th>Nom</th>
                             <th>Latitude</th>
                             <th>Longitude</th>
@@ -85,17 +82,18 @@
                     <tbody>
                         @foreach ($employees as $employee)
                         <tr>
+                            <td>{{ $employee->Mat }}</td>
                             <td>{{ $employee->name }}</td>
                             <td>{{ $employee->latitude }}</td>
                             <td>{{ $employee->longitude }}</td>
                             <td>
-                                <a class="btn btn-primary" href="{{ url('admin/employe/editer/'.$employee->id) }}" title="Modifier cet employé">
+                                <a class="btn btn-primary" href="{{ url('admin/employes/editer/'.$employee->id) }}" title="Modifier cet employé">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a class="btn btn-danger" href="{{ url('admin/employe/supprimer/'.$employee->id) }}" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet Employé ?');" title="Supprimer cet employé">
+                                <a class="btn btn-danger" href="{{ url('admin/employes/supprimer/'.$employee->id) }}" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet Employé ?');" title="Supprimer cet employé">
                                     <i class="fas fa-trash"></i>
                                 </a>
-                                <a class="btn btn-success" href="{{ url('admin/employe/localisation/'.$employee->id) }}" title="Afficher la localisation de cet employé">
+                                <a class="btn btn-success" href="{{ url('admin/employes/localisation/'.$employee->id) }}" title="Afficher la localisation de cet employé">
                                     <i class="fas fa-map-marker-alt"></i>
                                 </a>
                             </td>
@@ -121,10 +119,9 @@
 <script>
     function validateForm() {
         var name = document.getElementById('nameInput').value.trim();
-        var latitude = document.getElementById('latitudeInput').value.trim();
-        var longitude = document.getElementById('longitudeInput').value.trim();
+        var mat = document.getElementById('matInput').value.trim();
 
-        if (name === "" && latitude === "" && longitude === "") {
+        if (name === "" && mat === "") {
             alert("Veuillez remplir au moins un champ.");
             return false; // Prevent form submission
         }
