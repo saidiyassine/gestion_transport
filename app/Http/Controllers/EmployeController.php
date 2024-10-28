@@ -9,8 +9,8 @@ use App\Models\Transport;
 class EmployeController extends Controller
 {
     public function dashboard() {
-        $employes = Employe::count();
-        $transports = Transport::count();
+        $employes = Employe::where('is_deleted', 0)->count();
+        $transports = Transport::where('is_deleted', 0)->count();
         return view("admin.dashboard", compact("employes", "transports"));
     }
 
@@ -95,5 +95,60 @@ class EmployeController extends Controller
             $employe = Employe::findOrFail($id);
             return view('admin.employes.location', compact('employe'));
         }
+
+
+        public function getClosestTransportZoneAndDistancesByEmployeId($id)
+        {
+            $employe = Employe::find($id);
+
+            if (!$employe) {
+                return "Employé non trouvé";
+            }
+
+            $latitude = $employe->latitude;
+            $longitude = $employe->longitude;
+
+            $zones = Transport::all();
+            $zoneAppartenance = null;
+            $minDistance = PHP_INT_MAX;
+            $distances = [];
+
+            $haversine = function ($lat1, $lon1, $lat2, $lon2) {
+                $earthRadius = 6371;
+
+                $dLat = deg2rad($lat2 - $lat1);
+                $dLon = deg2rad($lon2 - $lon1);
+
+                $a = sin($dLat / 2) * sin($dLat / 2) +
+                    cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+                    sin($dLon / 2) * sin($dLon / 2);
+                $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+                return $earthRadius * $c;
+            };
+
+            foreach ($zones as $zone) {
+                $distance = $haversine($latitude, $longitude, $zone->center_lat, $zone->center_lng);
+
+                $distances[] = [
+                    'zone' => $zone->name,
+                    'distance' => $distance
+                ];
+
+                if ($distance <= ($zone->radius / 1000) && $distance < $minDistance) {
+                    $minDistance = $distance;
+                    $zoneAppartenance = $zone->name;
+                }
+            }
+
+            if ($zoneAppartenance === null) {
+                $zoneAppartenance = "Aucun transport";
+                $minDistance = null;
+            }
+
+            return view('admin.employes.zones', compact('employe','zoneAppartenance', 'minDistance', 'distances'));
+        }
+
+
 
 }

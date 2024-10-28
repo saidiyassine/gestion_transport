@@ -96,6 +96,9 @@
                                 <a class="btn btn-success" href="{{ url('admin/employes/localisation/'.$employee->id) }}" title="Afficher la localisation de cet employé">
                                     <i class="fas fa-map-marker-alt"></i>
                                 </a>
+                                <a class="btn btn-warning" href="{{ url('admin/employes/zone/'.$employee->id) }}" title="Afficher la zone de cet employé">
+                                    <i class="fas fa-bullseye"></i>
+                                </a>
                             </td>
                         </tr>
                         @endforeach

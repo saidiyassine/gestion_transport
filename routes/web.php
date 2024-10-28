@@ -21,6 +21,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post("/admin/employes/update/{id}",[EmployeController::class,"update"]);
     Route::get("/admin/employes/supprimer/{id}",[EmployeController::class,"delete"]);
     Route::get("/admin/employes/localisation/{id}",[EmployeController::class,"showLocation"]);
+    Route::get("/admin/employes/zone/{id}",[EmployeController::class,"getClosestTransportZoneAndDistancesByEmployeId"]);
 
     Route::get("/admin/transports/lister",[TransportController::class,"lister"]);
     Route::get("/admin/transports/add",[TransportController::class,"addForm"]);
