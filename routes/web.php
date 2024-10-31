@@ -31,4 +31,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get("/admin/transports/supprimer/{id}",[TransportController::class,"supprimer"]);
     Route::get("/admin/transports/localisation/{id}",[TransportController::class,"showLocation"]);
     Route::get("/admin/transports/showAllZones/",[TransportController::class,"showAllZones"]);
+    Route::get("/admin/transports/showTraject/{id}",[TransportController::class,"showTraject"]);
 });

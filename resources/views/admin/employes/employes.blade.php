@@ -53,6 +53,14 @@
                             <label for="nameInput">Nom Complet</label>
                             <input type="text" name="name" class="form-control" id="nameInput" placeholder="Saisir le nom">
                         </div>
+                        <div class="form-group col-md-3">
+                            <label for="mode">Mode de transport</label>
+                            <select name="motorise" class="form-control" id="motorizedSelect" >
+                                <option selected disabled value="">Sélectionner le mode</option>
+                                <option value="1">Motorisé</option>
+                                <option value="0">Non motorisé</option>
+                            </select>
+                        </div>
                         <div class="form-group col-md-3 d-flex" style="margin-top: 32px;">
                             <button class="btn btn-primary me-2" type="submit">Chercher</button>
                             <a style="margin-left: 4px" href="{{ url('admin/employes/lister') }}" class="btn btn-success">Réinitialiser</a>
@@ -74,6 +82,7 @@
                         <tr>
                             <th>Matricule</th>
                             <th>Nom</th>
+                            <th>Mode de transport</th>
                             <th>Latitude</th>
                             <th>Longitude</th>
                             <th>Opérations</th>
@@ -84,6 +93,7 @@
                         <tr>
                             <td>{{ $employee->Mat }}</td>
                             <td>{{ $employee->name }}</td>
+                            <td>{{ $employee->moto == "1" ? "Motorisé" : "Non motorisé" }}</td>
                             <td>{{ $employee->latitude }}</td>
                             <td>{{ $employee->longitude }}</td>
                             <td>
@@ -93,12 +103,14 @@
                                 <a class="btn btn-danger" href="{{ url('admin/employes/supprimer/'.$employee->id) }}" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet Employé ?');" title="Supprimer cet employé">
                                     <i class="fas fa-trash"></i>
                                 </a>
-                                <a class="btn btn-success" href="{{ url('admin/employes/localisation/'.$employee->id) }}" title="Afficher la localisation de cet employé">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                </a>
-                                <a class="btn btn-warning" href="{{ url('admin/employes/zone/'.$employee->id) }}" title="Afficher la zone de cet employé">
-                                    <i class="fas fa-bullseye"></i>
-                                </a>
+                               @if ($employee->moto == "0")
+                                    <a class="btn btn-success" href="{{ url('admin/employes/localisation/'.$employee->id) }}" title="Afficher la localisation de cet employé">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                    </a>
+                                    <a class="btn btn-warning" href="{{ url('admin/employes/zone/'.$employee->id) }}" title="Afficher la zone de cet employé">
+                                        <i class="fas fa-bullseye"></i>
+                                    </a>
+                               @endif
                             </td>
                         </tr>
                         @endforeach
@@ -123,8 +135,9 @@
     function validateForm() {
         var name = document.getElementById('nameInput').value.trim();
         var mat = document.getElementById('matInput').value.trim();
+        var mode = document.getElementById('motorizedSelect').value.trim();
 
-        if (name === "" && mat === "") {
+        if (name === "" && mat === "" && mode == '') {
             alert("Veuillez remplir au moins un champ.");
             return false; // Prevent form submission
         }

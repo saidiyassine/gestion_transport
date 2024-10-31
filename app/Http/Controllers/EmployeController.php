@@ -11,13 +11,17 @@ class EmployeController extends Controller
     public function dashboard() {
         $employes = Employe::where('is_deleted', 0)->count();
         $transports = Transport::where('is_deleted', 0)->count();
-        return view("admin.dashboard", compact("employes", "transports"));
+        $non_mo = Employe::where('moto', "0")->where('is_deleted', 0)->count();
+        $mo = Employe::where('moto', "1")->where('is_deleted', 0)->count();
+        $transports_table = Transport::where('is_deleted', 0)->get();
+        return view("admin.dashboard", compact("employes", "transports","transports_table","non_mo","mo"));
     }
 
     public function lister(Request $request)
     {
         $name = $request->input('name');
         $mat = $request->input('mat');
+        $mode = $request->input('motorise');
 
         $query = Employe::where('is_deleted', 0);
 
@@ -28,10 +32,13 @@ class EmployeController extends Controller
         if ($mat) {
             $query->where('Mat', '=', "$mat");
         }
+        if ($mode) {
+            $query->where('moto', '=', "$mode");
+        }
 
         $total_employees = $query->count();
 
-        $employees = $query->orderBy('Mat', 'asc')->paginate(10);
+        $employees = $query->orderBy('Mat', 'asc')->paginate(20);
 
         if ($total_employees === 0) {
             session()->flash('attention', 'Aucun employe avec ces critères');
@@ -52,6 +59,7 @@ class EmployeController extends Controller
         $employe->latitude = $request->latitude;
         $employe->longitude = $request->longitude;
         $employe->is_deleted = 0;
+        $employe->moto = $request->motorise;
         $employe->save();
 
         return redirect("admin/employes/lister")->with('success', 'Employé ajouté avec succès.');
@@ -74,6 +82,7 @@ class EmployeController extends Controller
             $employe->name = $request->input('name');
             $employe->latitude = $request->input('latitude');
             $employe->longitude = $request->input('longitude');
+            $employe->moto = $request->input('motorise');
 
             $employe->save();
             return redirect('admin/employes/lister')->with('success', "L'employé a été mis à jour avec succès");

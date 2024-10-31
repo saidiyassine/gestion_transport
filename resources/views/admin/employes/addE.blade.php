@@ -48,6 +48,14 @@
                         <label for="longitude">Longitude</label>
                         <input type="number" name="longitude" class="form-control" id="longitudeInput" placeholder="Saisir la longitude" step="0.000001" min="-180" max="180" required>
                     </div>
+                    <div class="form-group">
+                        <label for="motorise">Mode de transport</label>
+                        <select name="motorise" class="form-control" id="motorizedSelect" required>
+                            <option selected disabled value="">Sélectionner le mode</option>
+                            <option value="1">Motorisé</option>
+                            <option value="0">Non motorisé</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="card-footer">
                     <button type="submit" class="btn btn-primary">Enregistrer</button>

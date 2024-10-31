@@ -57,6 +57,13 @@
                             <label for="longitudeInput">Longitude</label>
                             <input type="number" step="0.000001" min="-180" max="180" name="longitude" class="form-control" id="longitudeInput" value="{{ $employe->longitude }}" required>
                         </div>
+                        <div class="form-group">
+                            <label for="motorise">Mode de transport</label>
+                            <select name="motorise" class="form-control" id="motorizedSelect" required>
+                                <option value="1" {{ $employe->moto == 1 ? 'selected' : '' }}>Motorisé</option>
+                                <option value="0" {{ $employe->moto == 0 ? 'selected' : '' }}>Non motorisé</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div class="card-footer">

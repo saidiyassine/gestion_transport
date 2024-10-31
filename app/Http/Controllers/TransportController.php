@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Transport;
+use App\Models\Employe;
 use Illuminate\Http\Request;
 
 class TransportController extends Controller
@@ -104,8 +105,29 @@ class TransportController extends Controller
 
         public function showAllZones()
         {
-            $transports = Transport::all(); 
+            $transports = Transport::all();
             return view('admin.transports.allZones', compact('transports'));
         }
+
+        public function showTraject($id)
+        {
+            $transport = Transport::find($id);
+
+            if (!$transport) {
+                return redirect()->back()->with('error', 'Transport non trouvé');
+            }
+
+            $transportCoordinates = [
+                'lat' => $transport->center_lat,
+                'lng' => $transport->center_lng,
+            ];
+
+            $employes = Employe::where('is_deleted', 0)->where("moto","0")
+                                ->select('name', 'latitude', 'longitude')
+                                ->get();
+
+            return view('admin.transports.traject', compact('transport', 'transportCoordinates', 'employes'));
+        }
+
 
 }

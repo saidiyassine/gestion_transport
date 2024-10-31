@@ -18,7 +18,8 @@ class Employe extends Model
         'Mat',
         'name',
         'latitude',
-        'longitude'
+        'longitude',
+        'moto'
     ];
 
 
