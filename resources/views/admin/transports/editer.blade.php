@@ -57,10 +57,6 @@
                             <label for="capacityInput">Capacité</label>
                             <input type="number" name="capacity" class="form-control" id="capacityInput" value="{{ $transport->capacity }}" required>
                         </div>
-                        <div class="form-group col-md-4">
-                            <label for="radiusInput">Zone de Circulation (rayon en mètres)</label>
-                            <input type="number" name="radius" class="form-control" id="radiusInput" value="{{ $transport->radius }}" required>
-                        </div>
                     </div>
                 </div>
                 <div class="card-footer">

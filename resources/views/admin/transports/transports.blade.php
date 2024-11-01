@@ -81,7 +81,6 @@
                             <th>Latitude</th>
                             <th>Longitude</th>
                             <th>Capacité</th>
-                            <th>Zone de Circulation</th>
                             <th>Opérations</th>
                         </tr>
                     </thead>
@@ -92,7 +91,6 @@
                             <td>{{ $transport->center_lat }}</td>
                             <td>{{ $transport->center_lng }}</td>
                             <td>{{ $transport->capacity }}</td>
-                            <td>{{ $transport->radius }}</td>
                             <td>
                                 <a class="btn btn-primary" href="{{ url('admin/transports/editer/'.$transport->id) }}" title="Modifier ce transport">
                                     <i class="fas fa-edit"></i>

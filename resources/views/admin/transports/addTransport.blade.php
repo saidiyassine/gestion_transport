@@ -62,12 +62,6 @@
                                         <label for="center_lng">Longitude du Centre</label>
                                         <input required type="number" class="form-control" id="center_lng" name="center_lng" step="0.000001" min="-180" max="180" placeholder="Saisir la longitude du centre">
                                     </div>
-
-                                    <!-- Rayon du Cercle -->
-                                    <div class="form-group col-md-6">
-                                        <label for="radius">Rayon (en mètres)</label>
-                                        <input required type="number" class="form-control" id="radius" name="radius" placeholder="Saisir le rayon en mètres">
-                                    </div>
                                 </div>
                             </div>
 

@@ -50,8 +50,7 @@ class TransportController extends Controller
             $transport->name = $request->name;
             $transport->center_lat = $request->center_lat;
             $transport->center_lng = $request->center_lng;
-            $transport->capacity = $request->capacity; // Ajoute ce champ si nécessaire
-            $transport->radius = $request->radius;
+            $transport->capacity = $request->capacity;
             $transport->is_deleted = 0;
             $transport->save();
 
@@ -86,7 +85,6 @@ class TransportController extends Controller
             $transport->center_lat = $request->input('center_lat');
             $transport->center_lng = $request->input('center_lng');
             $transport->capacity = $request->input('capacity');
-            $transport->radius = $request->input('radius');
 
             $transport->save();
             return redirect('admin/transports/lister')->with('success', 'Transport mis à jour avec succès');

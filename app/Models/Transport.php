@@ -13,7 +13,6 @@ class Transport extends Model
         'name',
         'latitude',
         'longitude',
-        'radius',
         'is_deleted'
     ];
 }

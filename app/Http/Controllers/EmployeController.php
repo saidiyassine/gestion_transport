@@ -17,9 +17,9 @@ class EmployeController extends Controller
         $transports_table = Transport::where('is_deleted', 0)->get();
 
         $stationsCount = Employe::selectRaw('count(*) as total')
-        ->where('is_deleted', 0) 
-        ->whereNotNull('latitude') 
-        ->whereNotNull('longitude') 
+        ->where('is_deleted', 0)
+        ->whereNotNull('latitude')
+        ->whereNotNull('longitude')
         ->groupBy('latitude', 'longitude')
         ->get()
         ->count(); // Compte le nombre de groupes distincts
@@ -32,31 +32,31 @@ class EmployeController extends Controller
         $name = $request->input('name');
         $mat = $request->input('mat');
         $mode = $request->input('motorise');
-    
-        $query = Employe::with('transports')->where('is_deleted', 0); 
+
+        $query = Employe::with('transports')->where('is_deleted', 0);
         if ($name) {
             $query->where('name', 'LIKE', "%$name%");
         }
-    
+
         if ($mat) {
             $query->where('Mat', '=', "$mat");
         }
-    
+
         if ($mode) {
             $query->where('moto', '=', "$mode");
         }
-    
+
         $total_employees = $query->count();
-    
+
         $employees = $query->orderBy('Mat', 'asc')->paginate(20);
-    
+
         if ($total_employees === 0) {
             session()->flash('attention', 'Aucun employé avec ces critères');
         }
-    
+
         return view("admin.employes.employes", compact("employees", "total_employees"));
     }
-    
+
     public function addForm(){
         return view("admin.employes.addE");
     }
@@ -154,10 +154,11 @@ class EmployeController extends Controller
                     'distance' => $distance
                 ];
 
-                if ($distance <= ($zone->radius / 1000) && $distance < $minDistance) {
+                if ($minDistance === null || $distance < $minDistance) {
                     $minDistance = $distance;
                     $zoneAppartenance = $zone->name;
                 }
+
             }
 
             if ($zoneAppartenance === null) {
@@ -186,7 +187,7 @@ class EmployeController extends Controller
             // Redirection avec un message de succès
             return redirect('admin/employes/lister')->with('success', 'L\'employé a été affecté au transport avec succès.');
         }
-        
+
         public function afficherPoints(){
             $employes = Employe::where('is_deleted', 0)->get();
             return view('admin.employes.points', compact('employes'));
