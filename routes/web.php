@@ -22,6 +22,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get("/admin/employes/supprimer/{id}",[EmployeController::class,"delete"]);
     Route::get("/admin/employes/localisation/{id}",[EmployeController::class,"showLocation"]);
     Route::get("/admin/employes/zone/{id}",[EmployeController::class,"getClosestTransportZoneAndDistancesByEmployeId"]);
+    Route::get("/admin/employes/affecter/{id}",[EmployeController::class,"affecter"]);
+    Route::post("/admin/employes/affecter/{id}",[EmployeController::class,"affecterSave"]);
+    Route::get("/admin/employes/points",[EmployeController::class,"afficherPoints"]);
 
     Route::get("/admin/transports/lister",[TransportController::class,"lister"]);
     Route::get("/admin/transports/add",[TransportController::class,"addForm"]);

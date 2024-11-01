@@ -105,7 +105,7 @@ class TransportController extends Controller
 
         public function showAllZones()
         {
-            $transports = Transport::all();
+            $transports = Transport::where('is_deleted', 0)->get();
             return view('admin.transports.allZones', compact('transports'));
         }
 

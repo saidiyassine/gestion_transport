@@ -15,13 +15,13 @@
         // Initialize the map function
         function initMap() {
             // Get all transports data from the server
-            const transports = @json($transports);
+            const employes = @json($employes);
 
             // Dynamically set the initial map center based on the first transport location
-            if (transports.length > 0) {
+            if (employes.length > 0) {
                 const initialCenter = {
-                    lat: parseFloat(transports[0].center_lat),
-                    lng: parseFloat(transports[0].center_lng)
+                    lat: parseFloat(employes[0].latitude),
+                    lng: parseFloat(employes[0].longitude)
                 };
 
                 // Initialize the map centered on the first transport's location
@@ -31,19 +31,18 @@
                 });
 
                 // Loop through each transport zone from the backend
-                transports.forEach(transport => {
-                    addTransportZone(
-                        parseFloat(transport.center_lat),
-                        parseFloat(transport.center_lng),
-                        transport.name,
-                        parseInt(transport.radius)
+                employes.forEach(employe => {
+                    addEmployeZone(
+                        parseFloat(employe.latitude),
+                        parseFloat(employe.longitude),
+                        employe.name
                     );
                 });
             }
         }
 
         // Function to add a transport zone
-        function addTransportZone(lat, lng, name, radius) {
+        function addEmployeZone(lat, lng, name) {
             const location = { lat: lat, lng: lng };
 
             // Create a marker for the transport location
@@ -57,7 +56,7 @@
 
         }
     </script>
-    <script src="https://maps.gomaps.pro/maps/api/js?key=AlzaSywOM020DE8GaBc_yr52_o0EGXVFzh65r6C&callback=initMap" async defer></script>
+  <script src="https://maps.gomaps.pro/maps/api/js?key=AlzaSywOM020DE8GaBc_yr52_o0EGXVFzh65r6C&callback=initMap" async defer></script>
     {{-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCfWEW7jJT0pmSNtyOLH_NNkYXJVK40-zc&callback=initMap" async defer></script> --}}
 @endsection
 

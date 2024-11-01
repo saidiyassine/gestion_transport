@@ -20,22 +20,11 @@
                 title: "{{ $transport->name }}"
             });
 
-            // Add a circle (radius) around the marker
-            const circle = new google.maps.Circle({
-                map: map,
-                radius: {{ $transport->radius }},  // Radius in meters
-                fillColor: '#AA0000',
-                strokeColor: '#AA0000',
-                strokeOpacity: 0.5,
-                strokeWeight: 2,
-                fillOpacity: 0.2
-            });
-
-            // Center the circle around the marker
-            circle.bindTo('center', marker, 'position');
+           
         }
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCfWEW7jJT0pmSNtyOLH_NNkYXJVK40-zc&callback=initMap" async defer></script>
+    <script src="https://maps.gomaps.pro/maps/api/js?key=AlzaSywOM020DE8GaBc_yr52_o0EGXVFzh65r6C&callback=initMap" async defer></script>
+    {{-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCfWEW7jJT0pmSNtyOLH_NNkYXJVK40-zc&callback=initMap" async defer></script> --}}
 @endsection
 
 @section("nav")

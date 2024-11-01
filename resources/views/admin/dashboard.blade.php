@@ -71,13 +71,24 @@
                 </div>
 
                 <div class="col-lg-6 col-6">
-                    <div class="small-box bg-primary">
+                    <div class="small-box bg-warning">
                         <div class="inner">
                             <h3>{{ $mo }}</h3>
                             <p>Motorisé(e)</p>
                         </div>
                         <div class="icon">
                             <i class="fas fa-motorcycle"></i> <!-- Icône moto -->
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12 col-12">
+                    <div class="small-box bg-primary">
+                        <div class="inner">
+                            <h3>{{ $stationsCount }}</h3>
+                            <p>Stations</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-map-marker-alt"></i>
                         </div>
                     </div>
                 </div>

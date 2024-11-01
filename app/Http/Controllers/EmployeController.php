@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Employe;
 use App\Models\Transport;
+use App\Models\Traject;
 
 class EmployeController extends Controller
 {
@@ -14,7 +15,16 @@ class EmployeController extends Controller
         $non_mo = Employe::where('moto', "0")->where('is_deleted', 0)->count();
         $mo = Employe::where('moto', "1")->where('is_deleted', 0)->count();
         $transports_table = Transport::where('is_deleted', 0)->get();
-        return view("admin.dashboard", compact("employes", "transports","transports_table","non_mo","mo"));
+
+        $stationsCount = Employe::selectRaw('count(*) as total')
+        ->where('is_deleted', 0) 
+        ->whereNotNull('latitude') 
+        ->whereNotNull('longitude') 
+        ->groupBy('latitude', 'longitude')
+        ->get()
+        ->count(); // Compte le nombre de groupes distincts
+
+        return view("admin.dashboard", compact("employes", "transports","transports_table","non_mo","mo","stationsCount"));
     }
 
     public function lister(Request $request)
@@ -22,31 +32,31 @@ class EmployeController extends Controller
         $name = $request->input('name');
         $mat = $request->input('mat');
         $mode = $request->input('motorise');
-
-        $query = Employe::where('is_deleted', 0);
-
+    
+        $query = Employe::with('transports')->where('is_deleted', 0); 
         if ($name) {
             $query->where('name', 'LIKE', "%$name%");
         }
-
+    
         if ($mat) {
             $query->where('Mat', '=', "$mat");
         }
+    
         if ($mode) {
             $query->where('moto', '=', "$mode");
         }
-
+    
         $total_employees = $query->count();
-
+    
         $employees = $query->orderBy('Mat', 'asc')->paginate(20);
-
+    
         if ($total_employees === 0) {
-            session()->flash('attention', 'Aucun employe avec ces critères');
+            session()->flash('attention', 'Aucun employé avec ces critères');
         }
-
+    
         return view("admin.employes.employes", compact("employees", "total_employees"));
     }
-
+    
     public function addForm(){
         return view("admin.employes.addE");
     }
@@ -158,6 +168,29 @@ class EmployeController extends Controller
             return view('admin.employes.zones', compact('employe','zoneAppartenance', 'minDistance', 'distances'));
         }
 
+        public function affecter($id){
+            $employe=Employe::find($id);
+            $transports=Transport::where("is_deleted","0")->get();
+            return view("admin.employes.affecter",compact("employe","transports"));
+        }
+
+        public function affecterSave(Request $request)
+        {
+            // Créer l'affectation
+            $affectation = new Traject();
+            $affectation->transport_id = $request->input('transport_id');
+            $affectation->employee_id = $request->input('employee_id');
+            $affectation->is_deleted = "0"; // Ou bien vous pouvez omettre cette ligne si la valeur par défaut est "0"
+            $affectation->save();
+
+            // Redirection avec un message de succès
+            return redirect('admin/employes/lister')->with('success', 'L\'employé a été affecté au transport avec succès.');
+        }
+        
+        public function afficherPoints(){
+            $employes = Employe::where('is_deleted', 0)->get();
+            return view('admin.employes.points', compact('employes'));
+        }
 
 
 }

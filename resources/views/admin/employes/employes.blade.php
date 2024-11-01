@@ -22,6 +22,7 @@
                 </div>
                 <div class="col-sm-6" style="text-align: right;">
                     <a href="{{url('/admin/employes/add')}}" class="btn btn-primary">Ajouter Employé(e)</a>
+                    <a href="{{url('/admin/employes/points')}}" class="btn btn-warning">Afficher les points</a>
                 </div>
             </div>
         </div><!-- /.container-fluid -->
@@ -82,9 +83,8 @@
                         <tr>
                             <th>Matricule</th>
                             <th>Nom</th>
+                            <th>Transport</th>
                             <th>Mode de transport</th>
-                            <th>Latitude</th>
-                            <th>Longitude</th>
                             <th>Opérations</th>
                         </tr>
                     </thead>
@@ -93,9 +93,14 @@
                         <tr>
                             <td>{{ $employee->Mat }}</td>
                             <td>{{ $employee->name }}</td>
+                            <td>  @if($employee->transports->isNotEmpty())
+                                @foreach($employee->transports as $transport)
+                                    {{ $transport->name }}<br>
+                                @endforeach
+                            @else
+                                Aucun transport
+                            @endif</td>
                             <td>{{ $employee->moto == "1" ? "Motorisé" : "Non motorisé" }}</td>
-                            <td>{{ $employee->latitude }}</td>
-                            <td>{{ $employee->longitude }}</td>
                             <td>
                                 <a class="btn btn-primary" href="{{ url('admin/employes/editer/'.$employee->id) }}" title="Modifier cet employé">
                                     <i class="fas fa-edit"></i>
@@ -109,6 +114,9 @@
                                     </a>
                                     <a class="btn btn-warning" href="{{ url('admin/employes/zone/'.$employee->id) }}" title="Afficher la zone de cet employé">
                                         <i class="fas fa-bullseye"></i>
+                                    </a>
+                                    <a class="btn btn-info" href="{{ url('admin/employes/affecter/'.$employee->id) }}" title="Affecter Employé">
+                                        <i class="fas fa-arrow-right"></i>
                                     </a>
                                @endif
                             </td>
