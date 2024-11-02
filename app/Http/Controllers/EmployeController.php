@@ -177,16 +177,23 @@ class EmployeController extends Controller
 
         public function affecterSave(Request $request)
         {
-            // Créer l'affectation
-            $affectation = new Traject();
-            $affectation->transport_id = $request->input('transport_id');
-            $affectation->employee_id = $request->input('employee_id');
-            $affectation->is_deleted = "0"; // Ou bien vous pouvez omettre cette ligne si la valeur par défaut est "0"
+            $affectation = Traject::where('employee_id', $request->input('employee_id'))->first();
+
+            if ($affectation) {
+                $affectation->transport_id = $request->input('transport_id');
+                $affectation->is_deleted = 0;
+            } else {
+                $affectation = new Traject();
+                $affectation->transport_id = $request->input('transport_id');
+                $affectation->employee_id = $request->input('employee_id');
+                $affectation->is_deleted = 0;
+            }
+
             $affectation->save();
 
-            // Redirection avec un message de succès
             return redirect('admin/employes/lister')->with('success', 'L\'employé a été affecté au transport avec succès.');
         }
+
 
         public function afficherPoints(){
             $employes = Employe::where('is_deleted', 0)->get();

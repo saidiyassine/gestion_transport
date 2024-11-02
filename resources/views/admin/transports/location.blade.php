@@ -20,7 +20,7 @@
                 title: "{{ $transport->name }}"
             });
 
-           
+
         }
     </script>
     <script src="https://maps.gomaps.pro/maps/api/js?key=AlzaSywOM020DE8GaBc_yr52_o0EGXVFzh65r6C&callback=initMap" async defer></script>

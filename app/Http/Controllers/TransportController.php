@@ -110,22 +110,55 @@ class TransportController extends Controller
         public function showTraject($id)
         {
             $transport = Transport::find($id);
-
             if (!$transport) {
                 return redirect()->back()->with('error', 'Transport non trouvé');
             }
 
-            $transportCoordinates = [
-                'lat' => $transport->center_lat,
-                'lng' => $transport->center_lng,
-            ];
+            $latitude = $transport->center_lat;
+            $longitude = $transport->center_lng;
 
-            $employes = Employe::where('is_deleted', 0)->where("moto","0")
-                                ->select('name', 'latitude', 'longitude')
-                                ->get();
+           // Récupérer les employés affectés au transport, groupés par latitude et longitude
+            $employes = Employe::join('trajects', 'employees.id', '=', 'trajects.employee_id')
+            ->where('trajects.transport_id', $id)
+            ->where('employees.is_deleted', 0)
+            ->select('employees.latitude', 'employees.longitude')
+            ->groupBy('employees.latitude', 'employees.longitude')
+            ->get();
 
-            return view('admin.transports.traject', compact('transport', 'transportCoordinates', 'employes'));
+            // Initialiser un tableau pour stocker les distances
+            $distances = [];
+
+            // Fonction de calcul de la distance Haversine
+            $haversine = function ($lat1, $lon1, $lat2, $lon2) {
+                $earthRadius = 6371;
+
+                $dLat = deg2rad($lat2 - $lat1);
+                $dLon = deg2rad($lon2 - $lon1);
+
+                $a = sin($dLat / 2) * sin($dLat / 2) +
+                    cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+                    sin($dLon / 2) * sin($dLon / 2);
+                $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+                return $earthRadius * $c;
+            };
+
+            foreach ($employes as $employe) {
+                $distance = $haversine($latitude, $longitude, $employe->latitude, $employe->longitude);
+                $distances[] = [
+                    'latitude' => $employe->latitude,
+                    'longitude' => $employe->longitude,
+                    'distance' => $distance
+                ];
+            }
+
+            usort($distances, function ($a, $b) {
+                return $a['distance'] <=> $b['distance'];
+            });
+
+            return view('admin.transports.traject', compact('transport', 'distances'));
         }
+
 
 
 }

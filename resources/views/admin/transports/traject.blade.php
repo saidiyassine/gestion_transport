@@ -8,49 +8,87 @@
         }
     </style>
     <script>
-        function initMap() {
-            // Coordonnées du transport
-            const transportLocation = { lat: {{ $transportCoordinates['lat'] }}, lng: {{ $transportCoordinates['lng'] }} };
+       function initMap() {
+            const transportLocation = { lat: {{ $transport->center_lat}}, lng: {{ $transport->center_lng }} };
             const map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 12,
                 center: transportLocation,
                 mapTypeId: google.maps.MapTypeId.ROADMAP
             });
+
             const directionsService = new google.maps.DirectionsService();
             const directionsDisplay = new google.maps.DirectionsRenderer();
             directionsDisplay.setMap(map);
 
-            // Définir la destination
-            const destinationLocation = { lat: 34.010168, lng: -5.024848 };
+            const waypoints = [
+                @foreach($distances as $employe)
+                    { lat: {{ $employe['latitude'] }}, lng: {{ $employe['longitude'] }} },
+                @endforeach
+            ];
 
-            // Créer une requête
-            const request = {
-                origin: transportLocation,
-                destination: destinationLocation,
-                travelMode: google.maps.TravelMode.DRIVING, // Changer en WALKING, BICYCLING, TRANSIT selon le besoin
-                unitSystem: google.maps.UnitSystem.IMPERIAL
-            };
+            // Fonction pour dessiner un segment de trajet
+            function drawSegment(origin, destination) {
+                const request = {
+                    origin: origin,
+                    destination: destination,
+                    travelMode: google.maps.TravelMode.DRIVING,
+                    unitSystem: google.maps.UnitSystem.IMPERIAL
+                };
 
-            // Passer la requête à la méthode de route
-            directionsService.route(request, function (result, status) {
-                if (status === google.maps.DirectionsStatus.OK) {
-                    // Afficher l'itinéraire
-                    directionsDisplay.setDirections(result);
-                } else {
-                    // Supprimer l'itinéraire de la carte
-                    directionsDisplay.setDirections({ routes: [] });
-                    // Optionnellement, centrer la carte sur un emplacement par défaut (par exemple, Londres)
-                    map.setCenter({ lat: 51.5074, lng: -0.1278 }); // Exemple pour Londres
-                    console.error('La demande de directions a échoué en raison de ' + status);
-                }
+                directionsService.route(request, function(result, status) {
+                    if (status === google.maps.DirectionsStatus.OK) {
+                        const segmentDisplay = new google.maps.DirectionsRenderer();
+                        segmentDisplay.setMap(map);
+                        segmentDisplay.setDirections(result);
+                    } else {
+                        console.error('Direction request failed due to ' + status);
+                    }
+                });
+            }
+
+            // Dessiner le segment initial à partir du point de transport
+            if (waypoints.length > 0) {
+                drawSegment(transportLocation, waypoints[0]);
+            }
+
+            // Dessiner les segments entre chaque paire de points
+            for (let i = 0; i < waypoints.length - 1; i++) {
+                drawSegment(waypoints[i], waypoints[i + 1]);
+            }
+
+            // Dessiner le segment final vers la destination
+            const finalDestination = { lat: 33.989766, lng: -5.075888};
+            if (waypoints.length > 0) {
+                drawSegment(waypoints[waypoints.length - 1], finalDestination);
+            }
+
+            // Ajouter des marqueurs avec des titres
+            new google.maps.Marker({
+                position: transportLocation,
+                map: map,
+                title: 'Point de départ'
+            });
+
+            new google.maps.Marker({
+                position: finalDestination,
+                map: map,
+                title: 'Betycor'
             });
         }
 
-        // Appeler initMap après le chargement de l'API Google Maps
-        window.onload = initMap;
+        function loadScript() {
+            const script = document.createElement('script');
+            script.src = "https://maps.gomaps.pro/maps/api/js?key=AlzaSywOM020DE8GaBc_yr52_o0EGXVFzh65r6C&libraries=places&callback=initMap";
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+        }
+
+        window.onload = loadScript;
+
     </script>
-    <script src="https://maps.gomaps.pro/maps/api/js?key=AlzaSywOM020DE8GaBc_yr52_o0EGXVFzh65r6C&libraries=places" async defer></script>
 @endsection
+
 @section("content")
     <div class="content-wrapper">
         <section class="content-header">
@@ -71,6 +109,7 @@
         </div>
     </div>
 @endsection
+
 @section("footer-script")
     @include("dashboard.layouts.footer-script")
 @endsection
