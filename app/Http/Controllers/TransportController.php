@@ -117,12 +117,23 @@ class TransportController extends Controller
             $latitude = $transport->center_lat;
             $longitude = $transport->center_lng;
 
-           // Récupérer les employés affectés au transport, groupés par latitude et longitude
+           // Récupérer les employés affectés au transport, groupés par latitude et longitude, avec les noms
             $employes = Employe::join('trajects', 'employees.id', '=', 'trajects.employee_id')
             ->where('trajects.transport_id', $id)
             ->where('employees.is_deleted', 0)
-            ->select('employees.latitude', 'employees.longitude')
+            ->selectRaw('employees.latitude, employees.longitude, MIN(employees.name) as name')
             ->groupBy('employees.latitude', 'employees.longitude')
+            ->get();
+
+            $nonAffectes = Employe::leftJoin('trajects', function ($join) use ($id) {
+                $join->on('employees.id', '=', 'trajects.employee_id')
+                     ->where('trajects.transport_id', $id);
+            })
+            ->whereNull('trajects.employee_id')
+            ->where('employees.is_deleted', 0)
+            ->whereNotNull('employees.latitude')
+            ->whereNotNull('employees.longitude')
+            ->select('employees.*')
             ->get();
 
             // Initialiser un tableau pour stocker les distances
@@ -148,15 +159,43 @@ class TransportController extends Controller
                 $distances[] = [
                     'latitude' => $employe->latitude,
                     'longitude' => $employe->longitude,
-                    'distance' => $distance
+                    'distance' => $distance,
+                    'name' => $employe->name  // Use 'names' instead of 'name'
                 ];
             }
+
 
             usort($distances, function ($a, $b) {
                 return $a['distance'] <=> $b['distance'];
             });
 
-            return view('admin.transports.traject', compact('transport', 'distances'));
+            return view('admin.transports.traject', compact('transport', 'distances','nonAffectes'));
+        }
+
+        public function listTous()
+        {
+            $transports = Transport::where('is_deleted', 0)->get();
+
+            return view('admin.transports.select', compact('transports'));
+        }
+
+        public function listEmploye(Request $request)
+        {
+            $transportId = $request->input('transport_id');
+            if (!$transportId) {
+                return redirect()->back()->with('error', 'Transport non sélectionné.');
+            }
+
+            $transport = Transport::where('id', $transportId)->where('is_deleted', 0)->first();
+
+            if (!$transport) {
+                return redirect()->back()->with('error', 'Transport non trouvé ou supprimé.');
+            }
+
+            $employees = $transport->employees()->orderBy('Mat', 'asc')->get();
+            $totalEmployees = $employees->count();
+
+            return view('admin.transports.listEmploye', compact('transport', 'employees', 'totalEmployees'));
         }
 
 

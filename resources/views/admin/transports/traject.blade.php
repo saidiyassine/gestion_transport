@@ -8,8 +8,8 @@
         }
     </style>
     <script>
-       function initMap() {
-            const transportLocation = { lat: {{ $transport->center_lat}}, lng: {{ $transport->center_lng }} };
+                function initMap() {
+            const transportLocation = { lat: {{ $transport->center_lat }}, lng: {{ $transport->center_lng }} };
             const map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 12,
                 center: transportLocation,
@@ -17,17 +17,15 @@
             });
 
             const directionsService = new google.maps.DirectionsService();
-            const directionsDisplay = new google.maps.DirectionsRenderer();
-            directionsDisplay.setMap(map);
 
             const waypoints = [
                 @foreach($distances as $employe)
-                    { lat: {{ $employe['latitude'] }}, lng: {{ $employe['longitude'] }} },
+                    { lat: {{ $employe['latitude'] }}, lng: {{ $employe['longitude'] }}, title: '{{ $employe['name'] }}' },
                 @endforeach
             ];
 
-            // Fonction pour dessiner un segment de trajet
-            function drawSegment(origin, destination) {
+            // Fonction pour tracer un segment de route avec infobulle pour chaque point de destination
+            function drawSegment(origin, destination, title) {
                 const request = {
                     origin: origin,
                     destination: destination,
@@ -37,44 +35,75 @@
 
                 directionsService.route(request, function(result, status) {
                     if (status === google.maps.DirectionsStatus.OK) {
-                        const segmentDisplay = new google.maps.DirectionsRenderer();
-                        segmentDisplay.setMap(map);
+                        const segmentDisplay = new google.maps.DirectionsRenderer({
+                            map: map,
+                            suppressMarkers: true // Empêche l'ajout automatique de marqueurs pour le segment
+                        });
                         segmentDisplay.setDirections(result);
+
+                        // Ajouter un marqueur au point de destination avec le nom de l'employé
+                        const marker = new google.maps.Marker({
+                            position: destination, // Utilise destination ici
+                            map: map,
+                            title: title
+                        });
+
+                        const infoWindow = new google.maps.InfoWindow({
+                            content: `<b>${title}</b>`
+                        });
+
+                        marker.addListener('click', () => {
+                            infoWindow.open(map, marker);
+                        });
                     } else {
                         console.error('Direction request failed due to ' + status);
                     }
                 });
             }
 
-            // Dessiner le segment initial à partir du point de transport
+            // Dessiner les segments de route entre chaque paire de points
             if (waypoints.length > 0) {
-                drawSegment(transportLocation, waypoints[0]);
+                drawSegment(transportLocation, waypoints[0], waypoints[0].title);
             }
 
-            // Dessiner les segments entre chaque paire de points
             for (let i = 0; i < waypoints.length - 1; i++) {
-                drawSegment(waypoints[i], waypoints[i + 1]);
+                drawSegment(waypoints[i], waypoints[i + 1], waypoints[i + 1].title);
             }
 
-            // Dessiner le segment final vers la destination
-            const finalDestination = { lat: 33.989766, lng: -5.075888};
+            // Ajouter le segment final vers la destination
+            const finalDestination = { lat: 33.989766, lng: -5.075888 };
             if (waypoints.length > 0) {
-                drawSegment(waypoints[waypoints.length - 1], finalDestination);
+                drawSegment(waypoints[waypoints.length - 1], finalDestination, 'Betycor');
             }
 
-            // Ajouter des marqueurs avec des titres
+            // Ajouter un marqueur pour le point de départ
             new google.maps.Marker({
                 position: transportLocation,
                 map: map,
                 title: 'Point de départ'
             });
 
+            // Ajouter un marqueur pour la destination finale
             new google.maps.Marker({
                 position: finalDestination,
                 map: map,
                 title: 'Betycor'
             });
+
+             // Ajouter des marqueurs pour les employés non affectés
+        @foreach($nonAffectes as $nonAffecte)
+            @if(!is_null($nonAffecte->latitude) && !is_null($nonAffecte->longitude))
+                new google.maps.Marker({
+                    position: { lat: {{ $nonAffecte->latitude }}, lng: {{ $nonAffecte->longitude }} },
+                    map: map,
+                    title: '{{ $nonAffecte->name }}', // Utiliser le nom de l'employé non affecté pour le titre
+                    icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+                });
+            @endif
+        @endforeach
         }
+
+
 
         function loadScript() {
             const script = document.createElement('script');

@@ -37,6 +37,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="{{ url('admin/list/lister') }}" class="nav-link @if(Request::segment('2') == "list") active @endif">
+                        <i class="nav-icon fas fa-list"></i>
+                        <p>Listes</p>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="{{ url('logout') }}" class="nav-link">
                         <i class="nav-icon fas fa-sign-out-alt"></i>
                         <p style="color: red">Se déconnecter</p>

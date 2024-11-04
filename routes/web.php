@@ -35,4 +35,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get("/admin/transports/localisation/{id}",[TransportController::class,"showLocation"]);
     Route::get("/admin/transports/showAllZones/",[TransportController::class,"showAllZones"]);
     Route::get("/admin/transports/showTraject/{id}",[TransportController::class,"showTraject"]);
+
+    Route::get("/admin/list/lister",[TransportController::class,"listTous"]);
+    Route::get("/admin/list/listEmploye",[TransportController::class,"listEmploye"]);
 });

@@ -127,7 +127,7 @@ class EmployeController extends Controller
             $latitude = $employe->latitude;
             $longitude = $employe->longitude;
 
-            $zones = Transport::all();
+            $zones = Transport::where("is_deleted","0")->get();
             $zoneAppartenance = null;
             $minDistance = PHP_INT_MAX;
             $distances = [];
@@ -177,23 +177,47 @@ class EmployeController extends Controller
 
         public function affecterSave(Request $request)
         {
-            $affectation = Traject::where('employee_id', $request->input('employee_id'))->first();
+            // Get the employee's latitude and longitude from the request
+            $employeeId = $request->input('employee_id');
+            $transportId = $request->input('transport_id');
 
-            if ($affectation) {
-                $affectation->transport_id = $request->input('transport_id');
-                $affectation->is_deleted = 0;
+            // Find the employee by ID to get their latitude and longitude
+            $employee = Employe::find($employeeId);
+
+            if ($employee) {
+                $latitude = $employee->latitude;
+                $longitude = $employee->longitude;
+
+                // Retrieve all employees with the same latitude and longitude
+                $employees = Employe::where('latitude', $latitude)
+                                     ->where('longitude', $longitude)
+                                     ->get();
+
+                foreach ($employees as $emp) {
+                    // Find or create a Traject record for each employee
+                    $affectation = Traject::where('employee_id', $emp->id)->first();
+
+                    if ($affectation) {
+                        // Update existing affectation
+                        $affectation->transport_id = $transportId;
+                        $affectation->is_deleted = 0;
+                    } else {
+                        // Create a new affectation
+                        $affectation = new Traject();
+                        $affectation->employee_id = $emp->id;
+                        $affectation->transport_id = $transportId;
+                        $affectation->is_deleted = 0;
+                    }
+
+                    // Save the affectation
+                    $affectation->save();
+                }
+
+                return redirect('admin/employes/lister')->with('success', 'Les employés ayant les mêmes coordonnées ont été affectés au transport avec succès.');
             } else {
-                $affectation = new Traject();
-                $affectation->transport_id = $request->input('transport_id');
-                $affectation->employee_id = $request->input('employee_id');
-                $affectation->is_deleted = 0;
+                return redirect('admin/employes/lister')->with('error', 'Employé introuvable.');
             }
-
-            $affectation->save();
-
-            return redirect('admin/employes/lister')->with('success', 'L\'employé a été affecté au transport avec succès.');
         }
-
 
         public function afficherPoints(){
             $employes = Employe::where('is_deleted', 0)->get();
