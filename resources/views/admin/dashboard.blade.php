@@ -97,7 +97,14 @@
             <!-- Transport List -->
             <div class="row mt-4">
                 <div class="col-12">
-                    <h2>Liste des Transports</h2>
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h2>Liste des Transports</h2>
+                        </div>
+                        <div class="col-sm-6" style="text-align: right;">
+                            <a href="{{url('/admin/transports/allTrajects')}}" class="btn btn-success">Tous les trajects</a>
+                        </div>
+                    </div>
                     <table class="table table-striped">
                         <thead>
                             <tr>

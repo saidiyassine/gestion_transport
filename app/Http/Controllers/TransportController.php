@@ -198,6 +198,60 @@ class TransportController extends Controller
             return view('admin.transports.listEmploye', compact('transport', 'employees', 'totalEmployees'));
         }
 
+        public function showAllTrajects()
+        {
+            $transports = Transport::where("is_deleted",0)->get();
+
+            $transportsData = [];
+            foreach ($transports as $transport) {
+                $latitude = $transport->center_lat;
+                $longitude = $transport->center_lng;
+
+                $employes = Employe::join('trajects', 'employees.id', '=', 'trajects.employee_id')
+                    ->where('trajects.transport_id', $transport->id)
+                    ->where('employees.is_deleted', 0)
+                    ->selectRaw('employees.latitude, employees.longitude, MIN(employees.name) as name')
+                    ->groupBy('employees.latitude', 'employees.longitude')
+                    ->get();
+                    
+                $distances = [];
+                $haversine = function ($lat1, $lon1, $lat2, $lon2) {
+                    $earthRadius = 6371;
+                    $dLat = deg2rad($lat2 - $lat1);
+                    $dLon = deg2rad($lon2 - $lon1);
+                    $a = sin($dLat / 2) * sin($dLat / 2) +
+                        cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+                        sin($dLon / 2) * sin($dLon / 2);
+                    $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+                    return $earthRadius * $c;
+                };
+
+                foreach ($employes as $employe) {
+                    $distance = $haversine($latitude, $longitude, $employe->latitude, $employe->longitude);
+                    $distances[] = [
+                        'latitude' => $employe->latitude,
+                        'longitude' => $employe->longitude,
+                        'distance' => $distance,
+                        'name' => $employe->name
+                    ];
+                }
+
+                usort($distances, fn($a, $b) => $a['distance'] <=> $b['distance']);
+
+                $transportsData[] = [
+                    'transport' => $transport,
+                    'distances' => $distances
+                ];
+            }
+            $nonAffectes = Employe::leftJoin('trajects', 'employees.id', '=', 'trajects.employee_id')
+            ->whereNull('trajects.employee_id')
+            ->where('employees.is_deleted', 0)
+            ->whereNotNull('employees.latitude')
+            ->whereNotNull('employees.longitude')
+            ->select('employees.*')
+            ->get();
+            return view('admin.transports.allTrajects', compact('transportsData','nonAffectes'));
+        }
 
 
 }
