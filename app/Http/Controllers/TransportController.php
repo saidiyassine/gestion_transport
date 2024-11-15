@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use App\Models\Transport;
 use App\Models\Employe;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 
 class TransportController extends Controller
 {
@@ -200,7 +202,7 @@ class TransportController extends Controller
 
         public function showAllTrajects()
         {
-            $transports = Transport::where("is_deleted",0)->get();
+            $transports = Transport::where("is_deleted", 0)->get();
 
             $transportsData = [];
             foreach ($transports as $transport) {
@@ -213,45 +215,151 @@ class TransportController extends Controller
                     ->selectRaw('employees.latitude, employees.longitude, MIN(employees.name) as name')
                     ->groupBy('employees.latitude', 'employees.longitude')
                     ->get();
-                    
-                $distances = [];
-                $haversine = function ($lat1, $lon1, $lat2, $lon2) {
-                    $earthRadius = 6371;
-                    $dLat = deg2rad($lat2 - $lat1);
-                    $dLon = deg2rad($lon2 - $lon1);
-                    $a = sin($dLat / 2) * sin($dLat / 2) +
-                        cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
-                        sin($dLon / 2) * sin($dLon / 2);
-                    $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
-                    return $earthRadius * $c;
-                };
 
-                foreach ($employes as $employe) {
-                    $distance = $haversine($latitude, $longitude, $employe->latitude, $employe->longitude);
+                // Only process if employees exist
+                if ($employes->isNotEmpty()) {
+                    $distances = [];
+                    $haversine = function ($lat1, $lon1, $lat2, $lon2) {
+                        $earthRadius = 6371;
+                        $dLat = deg2rad($lat2 - $lat1);
+                        $dLon = deg2rad($lon2 - $lon1);
+                        $a = sin($dLat / 2) * sin($dLat / 2) +
+                            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+                            sin($dLon / 2) * sin($dLon / 2);
+                        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+                        return $earthRadius * $c;
+                    };
+
+                    foreach ($employes as $employe) {
+                        $distance = $haversine($latitude, $longitude, $employe->latitude, $employe->longitude);
+                        $distances[] = [
+                            'latitude' => $employe->latitude,
+                            'longitude' => $employe->longitude,
+                            'distance' => $distance,
+                            'name' => $employe->name
+                        ];
+                    }
+
+                    usort($distances, fn($a, $b) => $a['distance'] <=> $b['distance']);
+
+                    $transportsData[] = [
+                        'transport' => $transport,
+                        'distances' => $distances
+                    ];
+                } else {
+                    // If no employees, add only the transport data without distances
+                    $transportsData[] = [
+                        'transport' => $transport,
+                        'distances' => []
+                    ];
+                }
+            }
+
+            $nonAffectes = Employe::leftJoin('trajects', 'employees.id', '=', 'trajects.employee_id')
+                ->whereNull('trajects.employee_id')
+                ->where('employees.is_deleted', 0)
+                ->whereNotNull('employees.latitude')
+                ->whereNotNull('employees.longitude')
+                ->select('employees.*')
+                ->get();
+
+            return view('admin.transports.allTrajects', compact('transportsData', 'nonAffectes'));
+        }
+
+
+        public function listMesure() {
+            // This will store data for each transport and its associated distances
+            $transportsData = [];
+
+            // Get all transport stations, replace with actual transport data
+            $transports = Transport::where("is_deleted",0)->get();
+
+            // Haversine function to calculate the distance between two points
+            $haversine = function($lat1, $lon1, $lat2, $lon2) {
+                $earthRadius = 6371; // Radius of the Earth in km
+
+                // Convert degrees to radians
+                $dLat = deg2rad($lat2 - $lat1);
+                $dLon = deg2rad($lon2 - $lon1);
+
+                // Haversine formula
+                $a = sin($dLat / 2) * sin($dLat / 2) +
+                    cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+                    sin($dLon / 2) * sin($dLon / 2);
+
+                $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+                // Return distance in kilometers
+                return $earthRadius * $c;
+            };
+
+            // Fixed end location
+            $endLatitude = 33.989766;
+            $endLongitude = -5.075888;
+
+            // Loop through each transport station
+            foreach ($transports as $transport) {
+                // Get the transport's latitude and longitude
+                $transportLatitude = $transport->center_lat;
+                $transportLongitude = $transport->center_lng;
+
+                // Get all employees associated with the transport
+                $employees = DB::table('employees')
+                    ->join('trajects', 'employees.id', '=', 'trajects.employee_id')
+                    ->where('trajects.transport_id', $transport->id)
+                    ->where('employees.is_deleted', 0)
+                    ->selectRaw('employees.latitude, employees.longitude, MIN(employees.name) as name')
+                    ->groupBy('employees.latitude', 'employees.longitude')
+                    ->get();
+
+                // Calculate the distance from transport to each employee and store the results
+                $distances = [];
+                $totalTrajectoryDistance = 0;
+
+                // First, calculate the distance from the transport to each employee
+                foreach ($employees as $employee) {
+                    $distance = $haversine($transportLatitude, $transportLongitude, $employee->latitude, $employee->longitude);
+
                     $distances[] = [
-                        'latitude' => $employe->latitude,
-                        'longitude' => $employe->longitude,
+                        'latitude' => $employee->latitude,
+                        'longitude' => $employee->longitude,
                         'distance' => $distance,
-                        'name' => $employe->name
+                        'name' => $employee->name
                     ];
                 }
 
+                // Sort the employees by the distance from the transport
                 usort($distances, fn($a, $b) => $a['distance'] <=> $b['distance']);
 
+                // Starting point is the transport station, so we initialize `lastEmployee` with transport's location
+                $lastEmployee = ['latitude' => $transportLatitude, 'longitude' => $transportLongitude];
+
+                // Calculate the total trajectory distance between the transport and each employee, and then between consecutive employees
+                foreach ($distances as $employee) {
+                    // Get the distance between the last point (either transport or last employee) and the current employee
+                    $employeeDistance = $haversine($lastEmployee['latitude'], $lastEmployee['longitude'], $employee['latitude'], $employee['longitude']);
+
+                    // Add this distance to the total trajectory distance
+                    $totalTrajectoryDistance += $employeeDistance;
+
+                    // Update the last employee's coordinates
+                    $lastEmployee = $employee;
+                }
+
+                // Now calculate the distance from the last employee to the fixed end location
+                $endPointDistance = $haversine($lastEmployee['latitude'], $lastEmployee['longitude'], $endLatitude, $endLongitude);
+                $totalTrajectoryDistance += $endPointDistance;
+
+                // Add the transport and the computed distances to the result array
                 $transportsData[] = [
                     'transport' => $transport,
-                    'distances' => $distances
+                    'distances' => $distances,
+                    'total_trajectory_distance' => $totalTrajectoryDistance // Store the total trajectory distance
                 ];
             }
-            $nonAffectes = Employe::leftJoin('trajects', 'employees.id', '=', 'trajects.employee_id')
-            ->whereNull('trajects.employee_id')
-            ->where('employees.is_deleted', 0)
-            ->whereNotNull('employees.latitude')
-            ->whereNotNull('employees.longitude')
-            ->select('employees.*')
-            ->get();
-            return view('admin.transports.allTrajects', compact('transportsData','nonAffectes'));
-        }
 
+            // Pass data to the view
+            return view("admin.transports.mesure", compact('transportsData'));
+        }
 
 }

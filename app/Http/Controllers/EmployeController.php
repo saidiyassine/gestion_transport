@@ -169,11 +169,19 @@ class EmployeController extends Controller
             return view('admin.employes.zones', compact('employe','zoneAppartenance', 'minDistance', 'distances'));
         }
 
-        public function affecter($id){
-            $employe=Employe::find($id);
-            $transports=Transport::where("is_deleted","0")->get();
-            return view("admin.employes.affecter",compact("employe","transports"));
+        public function affecter($id) {
+            $employe = Employe::find($id);
+            $transports = Transport::where("is_deleted", "0")->get();
+
+            // Vérifie si la latitude ou la longitude de l'employé est manquante
+            if (is_null($employe->latitude) || is_null($employe->longitude)) {
+                session()->flash('error', 'L\'employé n\'a pas de coordonnées géographiques (latitude et longitude). Il ne peut pas être affecté à un transport.');
+                return redirect()->back(); // Redirige vers la page précédente avec l'alerte
+            }
+
+            return view("admin.employes.affecter", compact("employe", "transports"));
         }
+
 
         public function affecterSave(Request $request)
         {

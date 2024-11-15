@@ -43,6 +43,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="{{ url('admin/mesure/lister') }}" class="nav-link @if(Request::segment('2') == "mesure") active @endif">
+                        <i class="nav-icon fas fa-chart-line"></i> <!-- Changer ici -->
+                        <p>Mesure</p>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="{{ url('logout') }}" class="nav-link">
                         <i class="nav-icon fas fa-sign-out-alt"></i>
                         <p style="color: red">Se déconnecter</p>

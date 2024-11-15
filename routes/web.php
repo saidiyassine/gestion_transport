@@ -39,4 +39,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get("/admin/list/lister",[TransportController::class,"listTous"]);
     Route::get("/admin/list/listEmploye",[TransportController::class,"listEmploye"]);
+
+    Route::get("/admin/mesure/lister",[TransportController::class,"listMesure"]);
 });
