@@ -362,4 +362,80 @@ class TransportController extends Controller
             return view("admin.transports.mesure", compact('transportsData'));
         }
 
+        public function transportsStations(){
+            $transports=Transport::where("is_deleted",0)->get();
+           return view('admin.transports.stationsTransport',compact("transports"));
+        }
+
+        public function employesStations(Request $request){
+            $transport_id=$request->transport_id;
+            $transport = Transport::where('id', $transport_id)->where('is_deleted', 0)->first();
+
+             // Get the transport's latitude and longitude
+             $transportLatitude = $transport->center_lat;
+             $transportLongitude = $transport->center_lng;
+
+             // Get all employees associated with the transport
+             $employees = DB::table('employees')
+                 ->join('trajects', 'employees.id', '=', 'trajects.employee_id')
+                 ->where('trajects.transport_id', $transport->id)
+                 ->where('employees.is_deleted', 0)
+                 ->selectRaw('employees.latitude, employees.longitude, MIN(employees.name) as name')
+                 ->groupBy('employees.latitude', 'employees.longitude')
+                 ->get();
+
+             // Calculate the distance from transport to each employee and store the results
+             $distances = [];
+
+              // Haversine function to calculate the distance between two points
+            $haversine = function($lat1, $lon1, $lat2, $lon2) {
+                $earthRadius = 6371; // Radius of the Earth in km
+
+                // Convert degrees to radians
+                $dLat = deg2rad($lat2 - $lat1);
+                $dLon = deg2rad($lon2 - $lon1);
+
+                // Haversine formula
+                $a = sin($dLat / 2) * sin($dLat / 2) +
+                    cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+                    sin($dLon / 2) * sin($dLon / 2);
+
+                $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+                // Return distance in kilometers
+                return $earthRadius * $c;
+            };
+
+             foreach ($employees as $employee) {
+                 $distance = $haversine($transportLatitude, $transportLongitude, $employee->latitude, $employee->longitude);
+
+                 $distances[] = [
+                     'latitude' => $employee->latitude,
+                     'longitude' => $employee->longitude,
+                     'distance' => $distance
+                 ];
+             }
+
+             // Sort the employees by the distance from the transport
+             usort($distances, fn($a, $b) => $a['distance'] <=> $b['distance']);
+
+             // Add the transport and the computed distances to the result array
+             $transportData = [
+                'transport' => $transport,
+                'distances' => $distances
+            ];
+           return view('admin.transports.stationsEmployes',compact("transportData"));
+        }
+
+        public function getEmployes($latitude, $longitude,$transportId) {
+            $employees = DB::table('employees')
+                ->where('latitude', $latitude)
+                ->where('longitude', $longitude)
+                ->where('is_deleted', 0)
+                ->get();
+
+            $count = $employees->count();
+
+            return view('admin.transports.employesStationList', compact('employees','count','transportId'));
+        }
 }

@@ -41,4 +41,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get("/admin/list/listEmploye",[TransportController::class,"listEmploye"]);
 
     Route::get("/admin/mesure/lister",[TransportController::class,"listMesure"]);
+
+    Route::get("/admin/stations/lister",[TransportController::class,"transportsStations"]);
+    Route::get("/admin/stations/listStations",[TransportController::class,"employesStations"]);
+    Route::get("/admin/stations/getEmployes/{latitude}/{longitude}/{transportId}",[TransportController::class,"getEmployes"]);
 });

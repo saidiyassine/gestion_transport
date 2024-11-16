@@ -49,6 +49,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="{{ url('admin/stations/lister') }}" class="nav-link @if(Request::segment('2') == 'stations') active @endif">
+                        <i class="nav-icon fas fa-map-marker-alt"></i> <!-- Icône de localisation -->
+                        <p>Stations</p>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="{{ url('logout') }}" class="nav-link">
                         <i class="nav-icon fas fa-sign-out-alt"></i>
                         <p style="color: red">Se déconnecter</p>
