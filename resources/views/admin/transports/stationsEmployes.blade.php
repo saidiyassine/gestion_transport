@@ -19,6 +19,7 @@
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1>Stations pour le Transport : {{ $transportData['transport']->name }}</h1>
+                    <p>Total des stations: <strong>{{ number_format($employesStations) }}</strong></p>
                 </div>
                 <div class="col-sm-6 text-right">
                     <!-- Bouton de retour -->

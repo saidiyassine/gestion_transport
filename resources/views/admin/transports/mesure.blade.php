@@ -45,6 +45,7 @@
                         <tr>
                             <th>Nom du Transport</th>
                             <th>Distance Totale du Trajet (km)</th>
+                            <th>Temps Estimé</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -52,6 +53,7 @@
                             <tr>
                                 <td>{{ $data['transport']->name }}</td>
                                 <td>{{ number_format($data['total_trajectory_distance'], 2) }} km</td>
+                                <td>{{ $data['estimated_time'] }}</td>
                             </tr>
                         @endforeach
                     </tbody>

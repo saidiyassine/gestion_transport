@@ -297,6 +297,8 @@ class TransportController extends Controller
             $endLatitude = 33.989766;
             $endLongitude = -5.075888;
 
+            $averageSpeed =48;
+
             // Loop through each transport station
             foreach ($transports as $transport) {
                 // Get the transport's latitude and longitude
@@ -350,11 +352,17 @@ class TransportController extends Controller
                 $endPointDistance = $haversine($lastEmployee['latitude'], $lastEmployee['longitude'], $endLatitude, $endLongitude);
                 $totalTrajectoryDistance += $endPointDistance;
 
+                // Calculer le temps total en heures et minutes
+                $totalTimeInHours = $totalTrajectoryDistance / $averageSpeed;
+                $hours = floor($totalTimeInHours);
+                $minutes = round(($totalTimeInHours - $hours) * 60);
+
                 // Add the transport and the computed distances to the result array
                 $transportsData[] = [
                     'transport' => $transport,
                     'distances' => $distances,
-                    'total_trajectory_distance' => $totalTrajectoryDistance // Store the total trajectory distance
+                    'total_trajectory_distance' => $totalTrajectoryDistance, // Store the total trajectory distance
+                    'estimated_time' => sprintf('%dh:%02dmin', $hours, $minutes)
                 ];
             }
 
@@ -383,6 +391,8 @@ class TransportController extends Controller
                  ->selectRaw('employees.latitude, employees.longitude, MIN(employees.name) as name')
                  ->groupBy('employees.latitude', 'employees.longitude')
                  ->get();
+
+            $employesStations=$employees->count();
 
              // Calculate the distance from transport to each employee and store the results
              $distances = [];
@@ -424,7 +434,7 @@ class TransportController extends Controller
                 'transport' => $transport,
                 'distances' => $distances
             ];
-           return view('admin.transports.stationsEmployes',compact("transportData"));
+           return view('admin.transports.stationsEmployes',compact("transportData","employesStations"));
         }
 
         public function getEmployes($latitude, $longitude,$transportId) {
