@@ -116,8 +116,8 @@ class TransportController extends Controller
                 return redirect()->back()->with('error', 'Transport non trouvé');
             }
 
-            $latitude = $transport->center_lat;
-            $longitude = $transport->center_lng;
+            $latitude = 33.989766;
+            $longitude = -5.075888;
 
            // Récupérer les employés affectés au transport, groupés par latitude et longitude, avec les noms
             $employes = Employe::join('trajects', 'employees.id', '=', 'trajects.employee_id')
@@ -166,9 +166,8 @@ class TransportController extends Controller
                 ];
             }
 
-
             usort($distances, function ($a, $b) {
-                return $a['distance'] <=> $b['distance'];
+                return $b['distance'] <=> $a['distance']; // Inversion pour un tri décroissant
             });
 
             return view('admin.transports.traject', compact('transport', 'distances','nonAffectes'));
@@ -206,8 +205,8 @@ class TransportController extends Controller
 
             $transportsData = [];
             foreach ($transports as $transport) {
-                $latitude = $transport->center_lat;
-                $longitude = $transport->center_lng;
+                $latitude = 33.989766;
+                $longitude = -5.075888;
 
                 $employes = Employe::join('trajects', 'employees.id', '=', 'trajects.employee_id')
                     ->where('trajects.transport_id', $transport->id)
@@ -240,7 +239,9 @@ class TransportController extends Controller
                         ];
                     }
 
-                    usort($distances, fn($a, $b) => $a['distance'] <=> $b['distance']);
+                    usort($distances, function ($a, $b) {
+                       return $b['distance'] <=> $a['distance'];
+                    });
 
                     $transportsData[] = [
                         'transport' => $transport,
@@ -297,7 +298,7 @@ class TransportController extends Controller
             $endLatitude = 33.989766;
             $endLongitude = -5.075888;
 
-            $averageSpeed =48;
+            $averageSpeed =50;
 
             // Loop through each transport station
             foreach ($transports as $transport) {
