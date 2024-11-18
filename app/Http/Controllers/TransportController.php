@@ -306,6 +306,9 @@ class TransportController extends Controller
                 $transportLatitude = $transport->center_lat;
                 $transportLongitude = $transport->center_lng;
 
+                $latitude = 33.989766;
+                $longitude = -5.075888;
+
                 // Get all employees associated with the transport
                 $employees = DB::table('employees')
                     ->join('trajects', 'employees.id', '=', 'trajects.employee_id')
@@ -321,7 +324,7 @@ class TransportController extends Controller
 
                 // First, calculate the distance from the transport to each employee
                 foreach ($employees as $employee) {
-                    $distance = $haversine($transportLatitude, $transportLongitude, $employee->latitude, $employee->longitude);
+                    $distance = $haversine($latitude, $longitude, $employee->latitude, $employee->longitude);
 
                     $distances[] = [
                         'latitude' => $employee->latitude,
@@ -331,8 +334,9 @@ class TransportController extends Controller
                     ];
                 }
 
-                // Sort the employees by the distance from the transport
-                usort($distances, fn($a, $b) => $a['distance'] <=> $b['distance']);
+                usort($distances, function ($a, $b) {
+                    return $b['distance'] <=> $a['distance'];
+                 });
 
                 // Starting point is the transport station, so we initialize `lastEmployee` with transport's location
                 $lastEmployee = ['latitude' => $transportLatitude, 'longitude' => $transportLongitude];
@@ -384,6 +388,10 @@ class TransportController extends Controller
              $transportLatitude = $transport->center_lat;
              $transportLongitude = $transport->center_lng;
 
+             $latitude = 33.989766;
+             $longitude = -5.075888;
+
+
              // Get all employees associated with the transport
              $employees = DB::table('employees')
                  ->join('trajects', 'employees.id', '=', 'trajects.employee_id')
@@ -418,7 +426,7 @@ class TransportController extends Controller
             };
 
              foreach ($employees as $employee) {
-                 $distance = $haversine($transportLatitude, $transportLongitude, $employee->latitude, $employee->longitude);
+                 $distance = $haversine($latitude, $longitude, $employee->latitude, $employee->longitude);
 
                  $distances[] = [
                      'latitude' => $employee->latitude,
@@ -427,8 +435,9 @@ class TransportController extends Controller
                  ];
              }
 
-             // Sort the employees by the distance from the transport
-             usort($distances, fn($a, $b) => $a['distance'] <=> $b['distance']);
+             usort($distances, function ($a, $b) {
+                return $b['distance'] <=> $a['distance'];
+             });
 
              // Add the transport and the computed distances to the result array
              $transportData = [
